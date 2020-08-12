@@ -9,13 +9,26 @@ $(function () {
     })
 
     $('#exampleModal #buttonSubmit').on("click", function () {
-        
-        $.get("/home/encode", { text: $("#myString").val() }).done(function (result) { console.log(result.url); }).always(function () {
+
+        $.get("/home/encode", { text: $("#myString").val() }).done(function (result) {
+            console.log(result.url);
+            $("#results").append(`<div class="row">
+            <div class="col-sm">
+                ${$("#myString").val()}
+            </div>
+            <div class="col-sm">
+                <img src='${result.url}'>
+            </div>
+        </div>`)
+        }).always(function () {
             $('#exampleModal').modal('hide');
         });
 
 
+
     });
+
+
 });
 
 

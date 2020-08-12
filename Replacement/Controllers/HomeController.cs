@@ -10,6 +10,8 @@ using System.Security.Cryptography;
 using System.IO;
 using System.Text;
 using System.Drawing;
+using System.Web;
+using System.Drawing.Text;
 
 namespace Replacement.Controllers
 {
@@ -44,19 +46,34 @@ namespace Replacement.Controllers
 
         public IActionResult Encode(string text)  {
 
-           /* GenerateKey();
-            byte[] encryptStr = EncryptData(text);
-            string decryptStr = DecryptData(encryptStr);*/
+             GenerateKey();
 
-            return Json(new { url = (text)
-        });
+            return Json(new { url = $"/home/image?text={HttpUtility.UrlEncode(Convert.ToBase64String(EncryptData(text)))}"});
+        }
+
+        public IActionResult Image(string text)
+        {
+
+
+            byte[] bytes = Convert.FromBase64String(text);
+          
+            string decodeStr = DecryptData(bytes);
+
+            Image img = CreateImg(decodeStr);
+            ImageConverter _imageConverter = new ImageConverter();
+            byte[] xByte = (byte[])_imageConverter.ConvertTo(img, typeof(byte[]));
+
+            return new FileContentResult(xByte, "image/png");
         }
 
 
-        public static void CreateImg(String text)
+
+
+        public static Image CreateImg(string text)
         {
 
-            Font font = new Font("Arial", 20);
+            Font font = new Font("Arial", 11);
+          
             //first, create a dummy bitmap just to get a graphics object
             Image newImg = new Bitmap(1, 1);
             Graphics drawing = Graphics.FromImage(newImg);
@@ -71,13 +88,16 @@ namespace Replacement.Controllers
             //create a new image of the right size
             newImg = new Bitmap((int)textSize.Width, (int)textSize.Height);
 
-            drawing = Graphics.FromImage(newImg);
 
+            drawing = Graphics.FromImage(newImg);
+        
             //paint the background
+
             drawing.Clear(Color.FromArgb(255, 255, 255));
 
             //create a brush for the text
-            Brush textBrush = new SolidBrush(Color.FromArgb(50, Color.Gray));
+            Brush textBrush = new SolidBrush(Color.FromArgb(0,0,0));
+           
 
             drawing.DrawString(text, font, textBrush, 0, 0);
 
@@ -86,7 +106,7 @@ namespace Replacement.Controllers
             textBrush.Dispose();
             drawing.Dispose();
 
-            // newImg;
+            return newImg;
         }
 
 
